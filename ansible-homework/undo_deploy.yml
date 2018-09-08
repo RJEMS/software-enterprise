@@ -1,0 +1,13 @@
+---
+- hosts: server
+  sudo: yes
+  tasks:
+    - name: remove python from remote host
+      apt: name=python
+    - name: remove apache2
+      apt: name=apache2
+    - name: Remove webpage files from remote host
+      remove:
+        dest: /var/www/html/index.html
+
+

@@ -1,2 +1,2 @@
-[apache]
+[server]
 ec2-54-215-249-109.us-west-1.compute.amazonaws.com ansible_ssh_user=ubuntu

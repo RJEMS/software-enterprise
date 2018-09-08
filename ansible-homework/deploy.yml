@@ -1,5 +1,5 @@
 ---
-- hosts: apache
+- hosts: server
   sudo: yes
   tasks:
     - name: install python
