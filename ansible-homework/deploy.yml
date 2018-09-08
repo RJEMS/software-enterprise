@@ -1,0 +1,17 @@
+---
+- hosts: apache
+  sudo: yes
+  tasks:
+    - name: install python
+      apt: name=python update_cache=yes state=latest
+    - name: install apache2
+      apt: name=apache2 update_cache=yes state=latest
+    - name: Copy webpagefiles to remote host
+      copy:
+        src: /Users/mattsmacbook/PycharmProjects/software-enterprise/src/index.html
+        dest: /var/www/html/
+
+  handlers:
+    - name: restart apache2
+      service: name=apache2 state=restarted
+
