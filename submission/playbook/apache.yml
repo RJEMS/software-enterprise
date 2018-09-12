@@ -1,0 +1,18 @@
+---
+- hosts: server
+  sudo: yes
+  tasks:
+
+    - name: install apache2
+      apt: name=apache2 update_cache=yes state=latest
+      notify:
+        - restart apache2
+
+    - name: copy hello world html file
+      template: 
+          src: /Users/emmelinetsen/Documents/San Jose State/CMPE272/hw1/submission/index.html
+          dest: /var/www/html 
+
+  handlers:
+    - name: restart apache2
+      service: name=apache2 state=restarted
