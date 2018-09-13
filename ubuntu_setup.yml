@@ -1,0 +1,17 @@
+---
+- hosts: ubuntu
+  sudo: yes
+  tasks:
+    - name: install python
+      apt: name=python update_cache=yes state=latest
+    - name: install apache2
+      apt: name=apache2 update_cache=yes state=latest
+    - name: copy_html_file
+      copy:
+        src: /Users/jonathan/Documents/272_enterprise_software/anisible/src/index.html
+        dest: /var/www/html
+
+  handlers:
+    - name: restart apache2
+      service: name=apache2 state=restarted
+
