@@ -6,9 +6,15 @@
       yum: name=python update_cache=yes state=latest
     - name: install httpd
       yum: name=httpd update_cache=yes state=latest
+
+    - name: start httpd on Linux
+      service:
+        name: httpd
+        state: started 
+
     - name: copy_html_file
       copy:
-        src: /Users/jonathan/Documents/272_enterprise_software/anisible/src/index.html
+        src: ./src/index.html
         dest: /var/www/html
   handlers:
     - name: restart httpd
