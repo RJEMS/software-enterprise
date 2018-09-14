@@ -1,6 +1,0 @@
----
-- hosts: server
-  sudo: yes
-  tasks:
-      - name: remove apache2
-        apt: name=apache2 state=absent
