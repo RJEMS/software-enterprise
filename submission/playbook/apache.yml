@@ -12,6 +12,9 @@
       template: 
           src: /Users/emmelinetsen/Documents/San Jose State/CMPE272/hw1/submission/index.html
           dest: /var/www/html 
+    
+    - name: remove apache2
+      apt: name=apache2 state=absent
 
   handlers:
     - name: restart apache2
