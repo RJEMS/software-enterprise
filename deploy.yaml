@@ -1,63 +1,68 @@
 ---
+  # Uses the group [all] in the host file and deploys to all hosts listed in the file
 - hosts: all
+  # Sets playbook permissions to super user
   sudo: yes
+  # Tasks: are the steps to be executed when the playbook is run
   tasks:
+      #name: Name to be displayed on the terminal during the running of the playbook
     - name: check if deployed
+      # stat: Gather file system status
       stat:
+        # path: Path to check if file exists
         path: /var/www/html/index.html
+      # Variable instantiation, based on existance of index.html, True it exists, False it does not
       register: deployed
       
-      #undeploy
-    - name: uninstall python on Linux
-      yum: name=python update_cache=yes state=absent
-      when: ansible_distribution == "Amazon" and deployed.stat.exists == True
-
+     # undeploy function that checks the deployed variable, and absent variable, to determine whether to uninstall python
+      # name: Name to be displayed on the terminal during the running of the playbook
     - name: uninstall python on Ubuntu
+      # apt: state variable is set to 'absent', so this will remove python when the deployed variable is set to True
       apt: name=python update_cache=yes state=absent
-      when: ansible_distribution == "Ubuntu" and deployed.stat.exists == True
-
-    - name: uninstall httpd on Linux
-      yum: name=httpd update_cache=yes state=absent
-      when: ansible_distribution == "Amazon" and deployed.stat.exists == True
-
-    - name: uninstall apache2 on Ubuntu
-      apt: name=apache2 update_cache=yes state=absent
-      when: ansible_distribution == "Ubuntu" and deployed.stat.exists == True
-
-    - name: Remove webpage files from remote host
-      file:
-        state: absent
-        path: /var/www/html/index.html
+      # when: Conditional statement to check status of the variable 'deployed' only execute if True
       when: deployed.stat.exists == True
 
+    # undeploy function that checks the deployed variable, and absent variable, to determine uninstall of apache2
+    # name: Name to be displayed on the terminal during the running of the playbook
+    - name: uninstall apache2 on Ubuntu
+      # apt: state variable is set to 'absent', so this will uninstall apache2 when the deployed variable is set to True
+      apt: name=apache2 update_cache=yes state=absent
+      # when: Conditional statement to check status of the variable 'deployed' only execute if True
+      when: deployed.stat.exists == True
 
-      #deploy
-    - name: install python on Linux
-      yum: name=python update_cache=yes state=latest
-      when: ansible_distribution == "Amazon" and deployed.stat.exists == False
+    # undeploy function that checks the deployed variable and if the deployed variable exists run task, remove index.html
+    - name: Remove webpage files from remote host
+      file:
+        # State: Set to absent to remove file
+        state: absent
+        # src path to remove index.html file on the VM
+        path: /var/www/html/index.html
+      # when: Conditional statement to check status of the variable 'deployed' only execute if True
+      when: deployed.stat.exists == True
 
+      #deploy latest version of python onto ubuntu VM
     - name: install python on Ubuntu
+      # state variable is set to latest, will install latest version of python
       apt: name=python update_cache=yes state=latest
-      when: ansible_distribution == "Ubuntu" and deployed.stat.exists == False
+      # when: Conditional statement to check status of the variable 'deployed' only execute if False
+      when: deployed.stat.exists == False
 
-    - name: install httpd on Linux
-      yum: name=httpd update_cache=yes state=latest
-      when: ansible_distribution == "Amazon" and deployed.stat.exists == False
-
-    - name: start httpd on Linux
-      service:
-        name: httpd
-        state: started 
-      when: ansible_distribution == "Amazon" and deployed.stat.exists == False
-
+      # deploy latest version of apache2 onto ubunto VM
     - name: install apache2 on Ubuntu
+      # state variable is set to latest, will install latest version of apache2
       apt: name=apache2 update_cache=yes state=latest
-      when: ansible_distribution == "Ubuntu" and deployed.stat.exists == False
+      # when: Conditional statement to check status of the variable 'deployed' only execute if False
+      when: deployed.stat.exists == False
 
+    # Copy html file to the host machine
     - name: copy_html_file
+      # Copy function
       copy:
+        # src: File location on local machine to copy
         src: ./src/index.html
+        # destination file path to copy .html file to VM machine
         dest: /var/www/html
+      # when: Conditional statement to check status of the variable 'deployed' only execute if False
       when: deployed.stat.exists == False
 
 
