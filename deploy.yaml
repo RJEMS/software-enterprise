@@ -1,0 +1,63 @@
+---
+- hosts: all
+  sudo: yes
+  tasks:
+    - name: check if deployed
+      stat:
+        path: /var/www/html/index.html
+      register: deployed
+      
+      #undeploy
+    - name: uninstall python on Linux
+      yum: name=python update_cache=yes state=absent
+      when: ansible_distribution == "Amazon" and deployed.stat.exists == True
+
+    - name: uninstall python on Ubuntu
+      apt: name=python update_cache=yes state=absent
+      when: ansible_distribution == "Ubuntu" and deployed.stat.exists == True
+
+    - name: uninstall httpd on Linux
+      yum: name=httpd update_cache=yes state=absent
+      when: ansible_distribution == "Amazon" and deployed.stat.exists == True
+
+    - name: uninstall apache2 on Ubuntu
+      apt: name=apache2 update_cache=yes state=absent
+      when: ansible_distribution == "Ubuntu" and deployed.stat.exists == True
+
+    - name: Remove webpage files from remote host
+      file:
+        state: absent
+        path: /var/www/html/index.html
+      when: deployed.stat.exists == True
+
+
+      #deploy
+    - name: install python on Linux
+      yum: name=python update_cache=yes state=latest
+      when: ansible_distribution == "Amazon" and deployed.stat.exists == False
+
+    - name: install python on Ubuntu
+      apt: name=python update_cache=yes state=latest
+      when: ansible_distribution == "Ubuntu" and deployed.stat.exists == False
+
+    - name: install httpd on Linux
+      yum: name=httpd update_cache=yes state=latest
+      when: ansible_distribution == "Amazon" and deployed.stat.exists == False
+
+    - name: start httpd on Linux
+      service:
+        name: httpd
+        state: started 
+      when: ansible_distribution == "Amazon" and deployed.stat.exists == False
+
+    - name: install apache2 on Ubuntu
+      apt: name=apache2 update_cache=yes state=latest
+      when: ansible_distribution == "Ubuntu" and deployed.stat.exists == False
+
+    - name: copy_html_file
+      copy:
+        src: ./src/index.html
+        dest: /var/www/html
+      when: deployed.stat.exists == False
+
+
